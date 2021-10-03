@@ -1,23 +1,32 @@
-import logo from './logo.svg';
+import React, { useCallback, useState, useRef, useMemo }from 'react';
+import Header from './components/Header';
+import useCharacters from './hooks/useCharacters.js';
+import Characters from './components/Characters';
 import './App.css';
 
-function App() {
+const API = 'https://pokeapi.co/api/v2/pokemon-species?offset=0&limit=6';
+
+const App = () => {
+  
+    const [search, setSearch] = useState('');
+    const searchInput = useRef(null);
+    const characters = useCharacters(API)
+  
+    const handleSearch = useCallback(() => {
+      setSearch(searchInput.current.value);
+    }, [])
+  
+    const filteredUsers = useMemo(() =>
+      characters.filter((user) => {
+        return user.name.toLowerCase().includes(search.toLowerCase());
+      }),
+      [characters, search]
+    )
+  
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Header search={search} searchInput={searchInput} handleSearch={handleSearch} />
+      <Characters filteredUsers={filteredUsers} />
     </div>
   );
 }
